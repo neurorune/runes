@@ -1,12 +1,5 @@
 #!/usr/bin/env lua
 
--- ----------------------------------
--- Resolve runes root dynamically
--- ----------------------------------
-local function dirname(path)
-  return path:match("(.*/)")
-end
-
 local function realpath(cmd)
   local f = io.popen(cmd)
   local p = f:read("*l")
@@ -14,27 +7,26 @@ local function realpath(cmd)
   return p
 end
 
--- path to this script
+local function dirname(path)
+  return path:match("(.*/)")
+end
+
+-- 🔧 FIX: derive runes root dynamically
 local SELF = realpath("readlink -f " .. arg[0])
 local RUNES_ROOT = dirname(SELF)
 
--- ----------------------------------
--- Language map
--- ----------------------------------
+-- original language map (unchanged behavior)
 local runes = {
-  c          = "C/.croc",
-  cpp        = "C++/.hydra",
-  javascript = "JavaScript/.bun",
-  python     = "Python/.waves",
-  rust       = "Rust/.ratatuya",
+  c          = RUNES_ROOT .. "C/.croc",
+  cpp        = RUNES_ROOT .. "C++/.hydra",
+  javascript = RUNES_ROOT .. "JavaScript/.bun",
+  python     = RUNES_ROOT .. "Python/.waves",
+  rust       = RUNES_ROOT .. "Rust/.ratatuya",
 }
 
--- ----------------------------------
--- Input
--- ----------------------------------
 local lang = arg[1]
 
-if not lang then
+if not lang or not runes[lang] then
   print("❌ Unknown language\n")
   print("Available runes:")
   for k, _ in pairs(runes) do
@@ -43,42 +35,15 @@ if not lang then
   os.exit(1)
 end
 
-local rune_path = runes[lang]
+local src = runes[lang]
 
-if not rune_path then
-  print("❌ Unknown language\n")
-  print("Available runes:")
-  for k, _ in pairs(runes) do
-    print("  • " .. k)
-  end
-  os.exit(1)
-end
-
--- ----------------------------------
--- Paths
--- ----------------------------------
-local src = RUNES_ROOT .. rune_path
-local dst = "./" .. rune_path:match("/(.+)$")
-
--- ----------------------------------
--- Sanity check
--- ----------------------------------
-local test = io.open(src)
-if not test then
-  print("❌ Rune source not found:")
-  print("   " .. src)
-  os.exit(1)
-end
-test:close()
-
--- ----------------------------------
--- Copy + run
--- ----------------------------------
-local copy_cmd = string.format("cp -r '%s' .", src)
-local ok = os.execute(copy_cmd)
+-- original behavior: copy hidden folder to cwd
+local cmd = string.format('cp -r "%s" .', src)
+local ok = os.execute(cmd)
 
 if ok then
-  os.execute("lua " .. dst .. "/run.lua")
+  local folder = src:match("(.*/)(%.[^/]+)$")
+  print("🪄 Summoned " .. (folder or "rune") .. " for " .. lang)
 else
   print("💥 Failed to summon rune")
 end
