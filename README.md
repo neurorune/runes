@@ -1,15 +1,8 @@
 
 # Runecall
 
-<iframe
-  width="560"
-  height="315"
-  src="https://www.youtube.com/embed/KDMeAB7pCYM"
-  title="YouTube video player"
-  frameborder="0"
-  allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-  allowfullscreen
-></iframe>
+[![Runecall demo](https://img.youtube.com/vi/KDMeAB7pCYM/0.jpg)](https://www.youtube.com/watch?v=KDMeAB7pCYM)
+
 
 Runecall is a filesystem-driven runner that uses **inotify** to watch your project
 and execute language-specific Lua runners on file changes.
