@@ -1,0 +1,59 @@
+#!/usr/bin/env lua
+
+local HOME = os.getenv("HOME")
+local RUNES = HOME .. "/Documents/Programming/runes"
+
+-- language registry
+local LANGS = {
+  cpp = {
+    src = RUNES .. "/C++/.hydra",
+    dest = ".hydra",
+  },
+  c = {
+    src = RUNES .. "/C/.croc",
+    dest = ".croc",
+  },
+  rust = {
+    src = RUNES .. "/Rust/.ratatuya",
+    dest = ".ratatuya",
+  },
+  python = {
+    src = RUNES .. "/Python/.waves",
+    dest = ".waves"
+  },
+  javascript = {
+    src = RUNES .. "/JavaScript/.bun",
+    dest = ".bun"
+  }
+}
+
+local lang = arg[1]
+
+if not lang or not LANGS[lang] then
+  print("❌ Unknown language\n")
+  print("Available runes:")
+  for k, _ in pairs(LANGS) do
+    print("  • " .. k)
+  end
+  os.exit(1)
+end
+
+local cfg = LANGS[lang]
+local target = "./" .. cfg.dest
+
+-- already exists?
+local check = os.execute("[ -d " .. target .. " ]")
+if check then
+  print("✨ " .. cfg.dest .. " already exists here")
+  os.exit(0)
+end
+
+-- copy
+local cmd = string.format("cp -r %s %s", cfg.src, target)
+local ok = os.execute(cmd)
+
+if ok then
+  print("🪄 Summoned " .. cfg.dest .. " for " .. lang)
+else
+  print("💥 Failed to summon rune")
+end

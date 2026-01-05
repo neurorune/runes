@@ -1,0 +1,5 @@
+alias hydra='./.hydra/run.lua'                  # C++
+alias croc='./.croc/run.lua'                    # C
+alias waves='./.waves/run.lua'                  # Python
+alias ratatuya='./.ratatuya/run.lua'            # Rust
+alias web='./.bun/run.lua'                      # JavaScript
