@@ -35,12 +35,11 @@ RUNES_DIR="$HOME/.config/runes"
 mkdir -p "$RUNES_DIR"
 
 # -----------------------------
-# 3. Copy everything
+# 3. Copy everything (FIXED)
 # -----------------------------
 echo "📂 Copying files to $RUNES_DIR"
 
-cp -r ./* "$RUNES_DIR"
-cp -r ./.??* "$RUNES_DIR" 2>/dev/null || true
+cp -r . "$RUNES_DIR"
 
 # -----------------------------
 # 4. Remove unwanted files
