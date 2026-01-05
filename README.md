@@ -42,7 +42,7 @@ Everything is installed into:
 ### Install
 
 ```bash
-git clone https://github.com/YOURNAME/runecall
+[git clone https://github.com/YOURNAME/runecall](https://github.com/neurorune/runes.git)
 cd runecall
 chmod +x install.sh
 ./install.sh
