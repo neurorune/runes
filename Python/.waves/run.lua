@@ -40,22 +40,15 @@ for line in watcher:lines() do
     os.execute("clear")
     print("🛠️  Compiling " .. filename)
     print(string.rep("─", 30))
+    --print("✅ Build success")
+    --print(string.rep("─", 30))
 
     local cmd = string.format("%s %s", PYTHON, filename)
-    local pipe = io.popen(cmd .. " 2>&1")
-    local output = pipe:read("*a")
-    local ok, _, code = pipe:close()
+    local code = os.execute(cmd)
 
-    if ok and code == 0 then
-      print("✅ Build success")
+    if not (code == true or code == 0) then
+      print("\n❌ (Correction) Build failed")
       print(string.rep("─", 30))
-      if output ~= "" then
-        io.write(output)
-      end
-    else
-      print("❌ Build failed")
-      print(string.rep("─", 30))
-      print(output)
     end
 
     -- 🔄 RENAME FROM
