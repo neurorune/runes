@@ -1,59 +1,84 @@
 #!/usr/bin/env lua
 
-local HOME = os.getenv("HOME")
-local RUNES = HOME .. "/Documents/Programming/runes"
+-- ----------------------------------
+-- Resolve runes root dynamically
+-- ----------------------------------
+local function dirname(path)
+  return path:match("(.*/)")
+end
 
--- language registry
-local LANGS = {
-  cpp = {
-    src = RUNES .. "/C++/.hydra",
-    dest = ".hydra",
-  },
-  c = {
-    src = RUNES .. "/C/.croc",
-    dest = ".croc",
-  },
-  rust = {
-    src = RUNES .. "/Rust/.ratatuya",
-    dest = ".ratatuya",
-  },
-  python = {
-    src = RUNES .. "/Python/.waves",
-    dest = ".waves"
-  },
-  javascript = {
-    src = RUNES .. "/JavaScript/.bun",
-    dest = ".bun"
-  }
+local function realpath(cmd)
+  local f = io.popen(cmd)
+  local p = f:read("*l")
+  f:close()
+  return p
+end
+
+-- path to this script
+local SELF = realpath("readlink -f " .. arg[0])
+local RUNES_ROOT = dirname(SELF)
+
+-- ----------------------------------
+-- Language map
+-- ----------------------------------
+local runes = {
+  c          = "C/.croc",
+  cpp        = "C++/.hydra",
+  javascript = "JavaScript/.bun",
+  python     = "Python/.waves",
+  rust       = "Rust/.ratatuya",
 }
 
+-- ----------------------------------
+-- Input
+-- ----------------------------------
 local lang = arg[1]
 
-if not lang or not LANGS[lang] then
+if not lang then
   print("❌ Unknown language\n")
   print("Available runes:")
-  for k, _ in pairs(LANGS) do
+  for k, _ in pairs(runes) do
     print("  • " .. k)
   end
   os.exit(1)
 end
 
-local cfg = LANGS[lang]
-local target = "./" .. cfg.dest
+local rune_path = runes[lang]
 
--- already exists?
-local check = os.execute("[ -d " .. target .. " ]")
-if check then
-  print("✨ " .. cfg.dest .. " already exists here")
-  os.exit(0)
+if not rune_path then
+  print("❌ Unknown language\n")
+  print("Available runes:")
+  for k, _ in pairs(runes) do
+    print("  • " .. k)
+  end
+  os.exit(1)
 end
 
--- copy
-local cmd = string.format("cp -r %s %s", cfg.src, target)
-local ok = os.execute(cmd)
+-- ----------------------------------
+-- Paths
+-- ----------------------------------
+local src = RUNES_ROOT .. rune_path
+local dst = "./" .. rune_path:match("/(.+)$")
+
+-- ----------------------------------
+-- Sanity check
+-- ----------------------------------
+local test = io.open(src)
+if not test then
+  print("❌ Rune source not found:")
+  print("   " .. src)
+  os.exit(1)
+end
+test:close()
+
+-- ----------------------------------
+-- Copy + run
+-- ----------------------------------
+local copy_cmd = string.format("cp -r '%s' .", src)
+local ok = os.execute(copy_cmd)
 
 if ok then
-  print("🪄 Summoned " .. cfg.dest .. " for " .. lang)
+  os.execute("lua " .. dst .. "/run.lua")
 else
   print("💥 Failed to summon rune")
 end
