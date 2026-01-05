@@ -1,10 +1,10 @@
-
 # Runecall
 
 Runecall is a filesystem-driven runner that uses **inotify** to watch your project
 and execute language-specific Lua runners on file changes.
 
-It is editor-agnostic and works entirely from the terminal.
+Everything is centralized under `~/.config/runes`.
+Aliases are **not optional** and are installed automatically.
 
 ---
 
@@ -48,12 +48,16 @@ chmod +x install.sh
 ./install.sh
 ```
 
-The installer will:
+The installer does **all required setup automatically**:
 
-- Copy `runes/` into `~/.config/runes`
-- Make `runecall` executable
-- Make **all `.lua` files executable**
-- Add `~/.config/runes` to `PATH`
+- Copies `runes/` into `~/.config/runes`
+- Makes `runecall` executable
+- Makes **all `.lua` files executable**
+- Installs `inotify-tools` if missing
+- Adds `~/.config/runes` to `PATH`
+- Sources `~/.config/runes/rune_alias` into `.bashrc`
+
+You do **not** need to manually add aliases.
 
 Restart your shell or run:
 
@@ -61,13 +65,35 @@ Restart your shell or run:
 source ~/.bashrc
 ```
 
-After that, `runecall` works from anywhere.
+---
+
+## Aliases (automatic)
+
+Aliases are defined in:
+
+```
+~/.config/runes/rune_alias
+```
+
+These are automatically sourced by the installer.
+
+Example aliases:
+
+```bash
+alias hydra='./.hydra/run.lua'        # C++
+alias croc='./.croc/run.lua'          # C
+alias waves='./.waves/run.lua'        # Python
+alias ratatuya='./.ratatuya/run.lua'  # Rust
+alias web='./.bun/run.lua'            # JavaScript
+```
+
+Users do **not** need to copy or edit these manually.
 
 ---
 
-## How It Works
+## Usage
 
-Inside a project directory, you summon a language:
+Inside an empty project directory, summon a language:
 
 ```bash
 runecall cpp
@@ -80,23 +106,13 @@ This copies a hidden language folder into the project:
 └── run.lua
 ```
 
-The `run.lua` script uses **inotify** to watch files and execute logic on save.
-
----
-
-## Optional Aliases
-
-For convenience, you may add:
+Then run:
 
 ```bash
-alias hydra='./.hydra/run.lua'       # C++
-alias croc='./.croc/run.lua'         # C
-alias waves='./.waves/run.lua'       # Python
-alias ratatuya='./.ratatuya/run.lua' # Rust
-alias web='./.bun/run.lua'           # JavaScript
+hydra
 ```
 
-These are optional.
+The project is now watched using **inotify** and executes on file save.
 
 ---
 
@@ -114,6 +130,7 @@ These are optional.
 
 ## Notes
 
-- No editor plugins required
-- No configuration files required
-- Everything is driven by filesystem events
+- No editor plugins
+- No manual alias setup
+- No configuration files
+- Everything is filesystem-driven
