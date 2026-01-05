@@ -10,7 +10,7 @@ Aliases are **not optional** and are installed automatically.
 
 ## Requirements
 
-Runecall **requires inotify**.
+Runecall **requires inotify, lua**.
 
 ### Linux
 
