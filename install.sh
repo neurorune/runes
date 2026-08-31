@@ -34,6 +34,11 @@ else
   install_inotify
 fi
 
+if ! command -v gcc >/dev/null 2>&1; then
+  echo "❌ gcc is required to build the runecall binary"
+  exit 1
+fi
+
 echo
 
 # =============================
@@ -47,18 +52,23 @@ echo "✔ Source: $SRC_DIR"
 echo
 
 # =============================
-# 3. Prepare destination
+# 3. Prepare destinations
 # =============================
 RUNES_DIR="$HOME/.config/runes"
-echo "📂 Preparing destination: $RUNES_DIR"
+BIN_DIR="$HOME/.local/bin"
+
+echo "📂 Preparing destinations..."
 
 mkdir -p "$RUNES_DIR"
-echo "✔ Destination ready"
+mkdir -p "$BIN_DIR"
+
+echo "✔ Runes dir: $RUNES_DIR"
+echo "✔ Binary dir: $BIN_DIR"
 
 echo
 
 # =============================
-# 4. Copy files (SAFE COPY)
+# 4. Copy runes
 # =============================
 echo "📦 Copying runes..."
 
@@ -75,26 +85,37 @@ echo "✔ Files copied"
 echo
 
 # =============================
-# 5. Permissions
+# 5. Build & install binary
+# =============================
+echo "🔨 Building runecall binary..."
+
+gcc -O2 -Wall -Wextra -o "$BIN_DIR/runecall" "$SRC_DIR/runecall.c"
+chmod +x "$BIN_DIR/runecall"
+
+echo "✔ Binary installed: $BIN_DIR/runecall"
+
+echo
+
+# =============================
+# 6. Permissions
 # =============================
 echo "⚙ Setting permissions..."
 
-chmod +x "$RUNES_DIR/runecall"
 chmod +x "$RUNES_DIR/rune_alias"
-
 find "$RUNES_DIR" -type d -name bin -exec chmod +x {}/* \; 2>/dev/null || true
+find "$RUNES_DIR" -type f -name "run.lua" -exec chmod +x {} \;
 
 echo "✔ Executables ready"
 
 echo
 
 # =============================
-# 6. PATH setup
+# 7. PATH setup
 # =============================
 echo "🧭 Configuring PATH..."
 
-if ! grep -q "$RUNES_DIR" "$HOME/.bashrc"; then
-  echo "export PATH=\"$RUNES_DIR:\$PATH\"" >> "$HOME/.bashrc"
+if ! grep -q "$BIN_DIR" "$HOME/.bashrc"; then
+  echo "export PATH=\"$BIN_DIR:\$PATH\"" >> "$HOME/.bashrc"
   echo "✔ PATH updated"
 else
   echo "✔ PATH already configured"
@@ -103,7 +124,7 @@ fi
 echo
 
 # =============================
-# 7. Alias sourcing
+# 8. Alias sourcing
 # =============================
 echo "🔗 Configuring aliases..."
 
@@ -117,10 +138,9 @@ fi
 echo
 
 # =============================
-# 8. Done
+# 9. Done
 # =============================
 
 echo "✨ Runes installed successfully."
 echo "🔁 Restart your shell or run: source ~/.bashrc"
 echo "🔥 runecall is ready."
-
